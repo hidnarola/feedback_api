@@ -137,7 +137,7 @@ var Feed = {
                 });
             },
             votes: function (callback) {
-                con.connection.query("select COALESCE(SUM(CASE WHEN vote_value = 1 THEN 1 ELSE 0 END),0) positive_votes,COALESCE(SUM(CASE WHEN vote_value =0 THEN 1 ELSE 0 END),0) negative_votes,COALESCE(AVG(CASE WHEN vote_value =1 THEN 1 ELSE 0 END),0) average_positive,COALESCE(AVG(CASE WHEN vote_value =0 THEN 1 ELSE 0 END),0) average_negative FROM feed_votes where feed_id= ?", [json.feed_id], function (err, result_votes) {
+                con.connection.query("select COALESCE(SUM(CASE WHEN vote_value = 1 THEN 1 ELSE 0 END),0) positive_votes,COALESCE(SUM(CASE WHEN vote_value =0 THEN 1 ELSE 0 END),0) negative_votes,ROUND(COALESCE(AVG(CASE WHEN vote_value =1 THEN 1 ELSE 0 END),0),2) average_positive,ROUND(COALESCE(AVG(CASE WHEN vote_value =0 THEN 1 ELSE 0 END),0),2) average_negative FROM feed_votes where feed_id= ?", [json.feed_id], function (err, result_votes) {
                     if (err) {
                         console.log(err);
                     } else {
