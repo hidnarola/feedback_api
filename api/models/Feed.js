@@ -146,7 +146,7 @@ var Feed = {
                 });
             },
             positive_location_votes: function (callback) {
-                con.connection.query("select id,feed_id,vote_value,user_id,city,state,country,DATE_FORMAT(created,'%Y-%m-%e %H:%i:%s') as created FROM feed_votes where feed_id= ? AND vote_value = 1 group by city,state,country", [json.feed_id], function (err, result_votes) {
+                con.connection.query("select COALESCE(SUM(CASE WHEN vote_value = 1 THEN 1 ELSE 0 END),0) total_votes,city,state,country FROM feed_votes where feed_id= ? AND vote_value = 1 group by city,state,country", [json.feed_id], function (err, result_votes) {
                     if (err) {
                         console.log(err);
                     } else {
@@ -155,7 +155,7 @@ var Feed = {
                 });
             },
             negative_location_votes: function (callback) {
-                con.connection.query("select id,feed_id,vote_value,user_id,city,state,country,DATE_FORMAT(created,'%Y-%m-%e %H:%i:%s') as created FROM feed_votes where feed_id= ? AND vote_value = 0 group by city,state,country", [json.feed_id], function (err, result_votes) {
+                con.connection.query("select COALESCE(SUM(CASE WHEN vote_value = 0 THEN 1 ELSE 0 END),0) total_votes,city,state,country FROM feed_votes where feed_id= ? AND vote_value = 0 group by city,state,country", [json.feed_id], function (err, result_votes) {
                     if (err) {
                         console.log(err);
                     } else {
