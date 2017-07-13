@@ -20,28 +20,29 @@ router.post('/createFeed', function (req, res, next) {
         },
     };
     req.check(schema);
-    var errors = req.validationErrors();
-    if (errors) {
-        var result = {
-            status: false,
-            error: errors
-        };
-        res.json(result);
-    } else {
-        User.createFeed(req.body, function (result) {
-            if (Object.keys(result).length > 0) {
-                res.status(200).json({
-                    status: true,
-                    data: result
-                });
-            } else {
-                res.status(422).json({
-                    status: false,
-                    message: 'Feed could not created.',
-                });
-            }
-        })
-    }
+    req.getValidationResult().then(function (result) {
+        if (!result.isEmpty()) {
+            var v_result = {
+                status: false,
+                error: result.array()
+            };
+            res.json(v_result);
+        } else {
+            User.createFeed(req.body, function (result) {
+                if (Object.keys(result).length > 0) {
+                    res.status(200).json({
+                        status: true,
+                        data: result
+                    });
+                } else {
+                    res.status(422).json({
+                        status: false,
+                        message: 'Feed could not created.',
+                    });
+                }
+            })
+        }
+    });
 });
 
 router.post('/getAllFeeds', function (req, res, next) {
@@ -63,30 +64,31 @@ router.post('/getAllFeeds', function (req, res, next) {
         },
     };
     req.check(schema);
-    var errors = req.validationErrors();
-    if (errors) {
-        var result = {
-            status: false,
-            error: errors
-        };
-        res.json(result);
-    } else {
-        User.getAllFeeds(req.body, function (result) {
-            res.status(200).json({
-                status: true,
-                data: result
-            });
-        })
-    }
+    req.getValidationResult().then(function (result) {
+        if (!result.isEmpty()) {
+            var v_result = {
+                status: false,
+                error: result.array()
+            };
+            res.json(v_result);
+        } else {
+            User.getAllFeeds(req.body, function (result) {
+                res.status(200).json({
+                    status: true,
+                    data: result
+                });
+            })
+        }
+    });
 });
 
-router.get(['/getUserProfile', '/getUserProfile/:user_id'], function (req, res, next) {    
+router.get(['/getUserProfile', '/getUserProfile/:user_id'], function (req, res, next) {
     var json = {};
     if (typeof req.params.user_id !== "undefined") {
         json.device_user_id = req.params.user_id;
     } else {
         json.device_user_id = req.body.device_user_id;
-    }    
+    }
     User.getUserProfile(json, function (result) {
         res.status(200).json({
             status: true,

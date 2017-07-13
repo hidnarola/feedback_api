@@ -36,38 +36,39 @@ router.post('/giveVote', function (req, res, next) {
         },
     };
     req.check(schema);
-    var errors = req.validationErrors();
-    if (errors) {
-        var result = {
-            status: false,
-            error: errors
-        };
-        res.json(result);
-    } else {
-        Feed.giveVote(req.body, function (result) {
-            if (Object.keys(result).length > 0 && result.hasOwnProperty('feed_vote_id')) {
-                res.status(200).json({
-                    status: true,
-                    data: result
-                });
-            } else if (Object.keys(result).length > 0 && result.hasOwnProperty('feed_not_exist')) {
-                res.status(422).json({
-                    status: false,
-                    message: 'Feed not exist.',
-                });
-            } else if (Object.keys(result).length > 0 && result.hasOwnProperty('vote_exist')) {
-                res.status(422).json({
-                    status: false,
-                    message: 'Feed vote already given.',
-                });
-            } else {
-                res.status(422).json({
-                    status: false,
-                    message: 'Something went wrong. Please try again.',
-                });
-            }
-        })
-    }
+    req.getValidationResult().then(function (result) {
+        if (!result.isEmpty()) {
+            var v_result = {
+                status: false,
+                error: result.array()
+            };
+            res.json(v_result);
+        } else {
+            Feed.giveVote(req.body, function (result) {
+                if (Object.keys(result).length > 0 && result.hasOwnProperty('feed_vote_id')) {
+                    res.status(200).json({
+                        status: true,
+                        data: result
+                    });
+                } else if (Object.keys(result).length > 0 && result.hasOwnProperty('feed_not_exist')) {
+                    res.status(422).json({
+                        status: false,
+                        message: 'Feed not exist.',
+                    });
+                } else if (Object.keys(result).length > 0 && result.hasOwnProperty('vote_exist')) {
+                    res.status(422).json({
+                        status: false,
+                        message: 'Feed vote already given.',
+                    });
+                } else {
+                    res.status(422).json({
+                        status: false,
+                        message: 'Something went wrong. Please try again.',
+                    });
+                }
+            })
+        }
+    });
 });
 router.post('/flagPost', function (req, res, next) {
     var schema = {
@@ -78,37 +79,73 @@ router.post('/flagPost', function (req, res, next) {
         },
     };
     req.check(schema);
-    var errors = req.validationErrors();
-    if (errors) {
-        var result = {
-            status: false,
-            error: errors
-        };
-        res.json(result);
-    } else {
-        Feed.flagPost(req.body, function (result) {
-            if (Object.keys(result).length > 0 && result.hasOwnProperty('flag_post_id')) {
-                res.status(200).json({
-                    status: true,
-                    data: result
-                });
-            } else if (Object.keys(result).length > 0 && result.hasOwnProperty('feed_deleted')) {
-                res.status(422).json({
-                    status: false,
-                    message: 'Feed is already deleted.',
-                });
-            } else if (Object.keys(result).length > 0 && result.hasOwnProperty('flagged')) {
-                res.status(422).json({
-                    status: false,
-                    message: 'Feed is already flagged.',
-                });
-            } else {
-                res.status(422).json({
-                    status: false,
-                    message: 'Something went wrong. Please try again.',
-                });
-            }
-        })
-    }
+    req.getValidationResult().then(function (result) {
+        if (!result.isEmpty()) {
+            var v_result = {
+                status: false,
+                error: result.array()
+            };
+            res.json(v_result);
+        } else {
+            Feed.flagPost(req.body, function (result) {
+                if (Object.keys(result).length > 0 && result.hasOwnProperty('flag_post_id')) {
+                    res.status(200).json({
+                        status: true,
+                        data: result
+                    });
+                } else if (Object.keys(result).length > 0 && result.hasOwnProperty('feed_deleted')) {
+                    res.status(422).json({
+                        status: false,
+                        message: 'Feed is already deleted.',
+                    });
+                } else if (Object.keys(result).length > 0 && result.hasOwnProperty('flagged')) {
+                    res.status(422).json({
+                        status: false,
+                        message: 'Feed is already flagged.',
+                    });
+                } else {
+                    res.status(422).json({
+                        status: false,
+                        message: 'Something went wrong. Please try again.',
+                    });
+                }
+            })
+        }
+    });
+});
+router.post('/getPostDetails', function (req, res, next) {
+    var schema = {
+        'feed_id': {
+            in: 'body',
+            notEmpty: true,
+            errorMessage: 'feed_id is required'
+        },
+    };
+    req.check(schema);
+    req.getValidationResult().then(function (result) {
+        if (!result.isEmpty()) {
+            var v_result = {
+                status: false,
+                error: result.array()
+            };
+            res.json(v_result);
+        } else {
+            Feed.getPostDetails(req.body, function (result) {
+                console.log('result', result);
+                if (result) {
+                    res.status(200).json({
+                        status: true,
+                        data: result
+                    });
+                } else {
+                    res.status(422).json({
+                        status: false,
+                        message: 'Something went wrong. Please try again.',
+                    });
+                }
+            })
+        }
+    });
+
 });
 module.exports = router;
