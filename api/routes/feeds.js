@@ -132,10 +132,15 @@ router.post('/getPostDetails', function (req, res, next) {
         } else {
             Feed.getPostDetails(req.body, function (result) {
                 console.log('result', result);
-                if (result) {
+                if (Object.keys(result).length > 0 && result.hasOwnProperty('feed')) {
                     res.status(200).json({
                         status: true,
                         data: result
+                    });
+                } else if (Object.keys(result).length > 0 && result.hasOwnProperty('feed_not_exist')) {
+                    res.status(422).json({
+                        status: false,
+                        message: 'Feed not exist.',
                     });
                 } else {
                     res.status(422).json({
