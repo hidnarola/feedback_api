@@ -131,7 +131,6 @@ router.post('/getPostDetails', function (req, res, next) {
             res.json(v_result);
         } else {
             Feed.getPostDetails(req.body, function (result) {
-                console.log('result', result);
                 if (Object.keys(result).length > 0 && result.hasOwnProperty('feed')) {
                     res.status(200).json({
                         status: true,
