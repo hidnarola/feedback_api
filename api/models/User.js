@@ -47,8 +47,13 @@ var User = {
 
     },
     getAllFeeds: function (json, callback) {
-        console.log("getAllFeeds Called.");
-        con.connection.query("SELECT f.id,f.feed_text,f.flag_type FROM feeds f INNER JOIN users u ON f.user_id = u.id WHERE u.city LIKE '%" + json.city + "%' AND u.state LIKE '%" + json.state + "%' AND u.country LIKE'%" + json.country + "%' AND f.is_deleted = '0' ORDER BY f.created desc", [json.city, json.state, json.country], function (err, result_feeds) {
+        console.log("getAllFeeds Called.",json);        
+        var sql = "SELECT f.id,f.feed_text,f.flag_type FROM feeds f INNER JOIN users u ON f.user_id = u.id WHERE u.city LIKE '%" + json.city + "%' AND u.state LIKE '%" + json.state + "%' AND u.country LIKE'%" + json.country + "%' AND f.is_deleted = '0' ORDER BY f.created desc";
+        if (typeof json.flag_type != 'undefined' && json.flag_type != '') {
+            sql = "SELECT f.id,f.feed_text,f.flag_type FROM feeds f INNER JOIN users u ON f.user_id = u.id WHERE f.flag_type = '" + json.flag_type + "' AND  u.city LIKE '%" + json.city + "%' AND u.state LIKE '%" + json.state + "%' AND u.country LIKE'%" + json.country + "%' AND f.is_deleted = '0' ORDER BY f.created desc";
+        }
+        console.log(sql);
+        con.connection.query(sql, [], function (err, result_feeds) {
             var result = {}
             if (err) {
                 console.log(err);
