@@ -18,14 +18,13 @@ var Feed = {
                             var is_update = false;
                             var is_insert = false;
                             if (result_fv.length > 0 && result_fv[0].hasOwnProperty('id')) {
-                                if (result_fv[0].vote_value == json.vote_value) {
+                              /*  if (result_fv[0].vote_value == json.vote_value) {
                                     var result = {}
-                                    result = {'vote_exist': json.id};
-                                    console.log(result);
+                                    result = {'vote_exist': json.id};                                   
                                     callback(result);
                                 } else {
-                                    is_update = true;
-                                }
+                                } */
+                                is_update = true;
                             } else {
                                 is_insert = true;
                             }
@@ -38,6 +37,7 @@ var Feed = {
                                     } else {
                                         result = {
                                             'feed_vote_id': result_fv[0].id,
+                                            'vote_value': json.vote_value,
                                         };
                                         callback(result)
                                     }
@@ -52,6 +52,7 @@ var Feed = {
                                     } else {
                                         result = {
                                             'feed_vote_id': result_feed.insertId,
+                                            'vote_value': json.vote_value,
                                         };
                                         callback(result)
                                     }
@@ -142,16 +143,36 @@ var Feed = {
                             });
                         },
                         votes: function (callback) {
-                            con.connection.query("select COALESCE(SUM(CASE WHEN vote_value = 1 THEN 1 ELSE 0 END),0) positive_votes,COALESCE(SUM(CASE WHEN vote_value =0 THEN 1 ELSE 0 END),0) negative_votes,ROUND(COALESCE(AVG(CASE WHEN vote_value =1 THEN 1 ELSE 0 END),0),2) average_positive,ROUND(COALESCE(AVG(CASE WHEN vote_value =0 THEN 1 ELSE 0 END),0),2) average_negative FROM feed_votes where feed_id= ?", [json.feed_id], function (err, result_votes) {
+                            con.connection.query("select COALESCE(SUM(CASE WHEN vote_value > 0 THEN 1 ELSE 0 END),0) positive_votes,COALESCE(SUM(CASE WHEN vote_value < 0 THEN 1 ELSE 0 END),0) negative_votes FROM feed_votes where feed_id= ?", [json.feed_id], function (err, result_votes) {
                                 if (err) {
                                     console.log(err);
                                 } else {
                                     callback(null, result_votes)
                                 }
                             });
+
+                        },
+                        average_positive: function (callback) {
+                            con.connection.query("select ROUND(COALESCE(AVG(CASE WHEN vote_value > 0 THEN vote_value ELSE 0 END),0),2) average_positive FROM feed_votes where feed_id= ? AND vote_value > 0", [json.feed_id], function (err, result_pos_avg_votes) {
+                                if (err) {
+                                    console.log(err);
+                                } else {
+                                    callback(null, result_pos_avg_votes)
+                                }
+                            });
+                        },
+                        average_negative: function (callback) {
+                            con.connection.query("select ROUND(COALESCE(AVG(CASE WHEN vote_value < 0 THEN vote_value ELSE 0 END),0),2) average_negative FROM feed_votes where feed_id= ? AND vote_value < 0", [json.feed_id], function (err, result_neg_avg_votes) {
+                                if (err) {
+                                    console.log(err);
+                                } else {
+                                    callback(null, result_neg_avg_votes)
+                                }
+                            });
+
                         },
                         positive_location_votes: function (callback) {
-                            con.connection.query("select COALESCE(SUM(CASE WHEN vote_value = 1 THEN 1 ELSE 0 END),0) total_votes,city,state,country FROM feed_votes where feed_id= ? AND vote_value = 1 group by city,state,country", [json.feed_id], function (err, result_votes) {
+                            con.connection.query("select id,vote_value,user_id,city,state,country FROM feed_votes where feed_id= ? AND vote_value > 0  group by city,state,country", [json.feed_id], function (err, result_votes) {
                                 if (err) {
                                     console.log(err);
                                 } else {
@@ -160,7 +181,7 @@ var Feed = {
                             });
                         },
                         negative_location_votes: function (callback) {
-                            con.connection.query("select COALESCE(SUM(CASE WHEN vote_value = 0 THEN 1 ELSE 0 END),0) total_votes,city,state,country FROM feed_votes where feed_id= ? AND vote_value = 0 group by city,state,country", [json.feed_id], function (err, result_votes) {
+                            con.connection.query("select id,vote_value,user_id,city,state,country FROM feed_votes where feed_id= ? AND vote_value < 0 group by city,state,country", [json.feed_id], function (err, result_votes) {
                                 if (err) {
                                     console.log(err);
                                 } else {
@@ -168,7 +189,12 @@ var Feed = {
                                 }
                             });
                         }
-                    }, function (err, results) {
+                    }, function (err, results) {                        
+                        results.votes[0]["average_positive"]= results.average_positive[0].average_positive;
+                        delete results.average_positive;
+                        
+                        results.votes[0]["average_negative"]= results.average_negative[0].average_negative;
+                        delete results.average_negative;
                         callback(results);
                     });
                 } else {

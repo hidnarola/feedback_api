@@ -58,7 +58,7 @@ router.post('/giveVote', function (req, res, next) {
                 } else if (Object.keys(result).length > 0 && result.hasOwnProperty('vote_exist')) {
                     res.status(422).json({
                         status: false,
-                        message: 'Feed vote already given.',
+                        message: 'Feed vote already given with same vote value.',
                     });
                 } else {
                     res.status(422).json({
