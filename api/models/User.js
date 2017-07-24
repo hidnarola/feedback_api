@@ -73,10 +73,9 @@ var User = {
         
         sql += " u.city LIKE '%" + json.city + "%' AND u.state LIKE '%" + json.state + "%' AND u.country LIKE '%" + json.country + "%' AND f.is_deleted = '0'";
         
-        sql += " ORDER BY f.created DESC";
+        sql += " ORDER BY f.created DESC,f.id DESC";
 
-        sql += " LIMIT "+limit;
-
+        sql += " LIMIT "+limit;		
         con.connection.query(sql, [], function (err, result_feeds) {
             var result = {}
             if (err) {
