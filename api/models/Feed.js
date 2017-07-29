@@ -18,12 +18,12 @@ var Feed = {
                             var is_update = false;
                             var is_insert = false;
                             if (result_fv.length > 0 && result_fv[0].hasOwnProperty('id')) {
-                              /*  if (result_fv[0].vote_value == json.vote_value) {
-                                    var result = {}
-                                    result = {'vote_exist': json.id};                                   
-                                    callback(result);
-                                } else {
-                                } */
+                                /*  if (result_fv[0].vote_value == json.vote_value) {
+                                 var result = {}
+                                 result = {'vote_exist': json.id};                                   
+                                 callback(result);
+                                 } else {
+                                 } */
                                 is_update = true;
                             } else {
                                 is_insert = true;
@@ -83,42 +83,59 @@ var Feed = {
                         result = {'feed_deleted': json.id};
                         callback(result);
                     } else {
-                        con.connection.query("SELECT id FROM flag_post where feed_id =? AND user_id = ?", [json.feed_id, json.device_user_id], function (err, result_fv) {
-                            var result = {}
-                            if (err) {
-                                console.log(err);
-                                callback(result)
-                            } else {
-                                var is_insert = false;
-                                if (result_fv.length > 0 && result_fv[0].hasOwnProperty('id')) {
+                        async.series({
+                            flag_post: function (callback) {
+                                con.connection.query("SELECT id FROM flag_post where feed_id =? AND user_id = ?", [json.feed_id, json.device_user_id], function (err, result_fv) {
                                     var result = {}
-                                    result = {'flagged': json.id};
-                                    console.log(result);
-                                    callback(result);
-                                } else {
-                                    is_insert = true;
-                                }
-                                if (is_insert) {
-                                    con.connection.query("Insert into flag_post (user_id,feed_id)  values(?,?)", [json.device_user_id, json.feed_id], function (err, rf) {
-                                        var result = {}
-                                        if (err) {
-                                            console.log(err);
-                                            callback(result)
+                                    if (err) {
+                                        console.log(err);
+                                        callback(null, result);
+                                    } else {
+                                        var is_insert = false;
+                                        if (result_fv.length > 0 && result_fv[0].hasOwnProperty('id')) {
+                                            var result = {}
+                                            result = {'flag_post_id': result_fv[0].id};
+                                            callback(null, result);
                                         } else {
-                                            result = {
-                                                'flag_post_id': rf.insertId,
-                                            };
-                                            callback(result)
+                                            is_insert = true;
                                         }
-                                    });
-                                }
+                                        if (is_insert) {
+                                            con.connection.query("Insert into flag_post (user_id,feed_id)  values(?,?)", [json.device_user_id, json.feed_id], function (err, rf) {
+                                                var result = {}
+                                                if (err) {
+                                                    console.log(err);
+                                                    callback(null, result);
+                                                } else {
+                                                    result = {
+                                                        'flag_post_id': rf.insertId,
+                                                    };
+                                                    callback(null, result);
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
+                            },
+                            feed_get: function (callback) {
+                                con.connection.query("SELECT f.id,f.is_deleted FROM feeds f  WHERE f.id= ? ", [json.feed_id], function (err, result_feeds) {
+                                    if (err) {
+                                        console.log(err);
+                                    } else {
+                                        var result_feeds_obj = {
+                                            'is_feed_deleted': (result_feeds[0].is_deleted == '1') ? true : false
+                                        };
+                                        callback(null, result_feeds_obj)
+                                    }
+                                });
                             }
+                        }, function (err, results) {
+                            var flag_result = Object.assign({}, results.flag_post, results.feed_get);
+                            callback(flag_result);
                         });
                     }
                 } else {
                     var result = {}
-                    result = {'feed_not_exist': json.feed_id};
-                    console.log(result);
+                    result = {'feed_not_exist': json.feed_id};                    
                     callback(result);
                 }
             }
@@ -189,11 +206,11 @@ var Feed = {
                                 }
                             });
                         }
-                    }, function (err, results) {                        
-                        results.votes[0]["average_positive"]= results.average_positive[0].average_positive;
+                    }, function (err, results) {
+                        results.votes[0]["average_positive"] = results.average_positive[0].average_positive;
                         delete results.average_positive;
-                        
-                        results.votes[0]["average_negative"]= results.average_negative[0].average_negative;
+
+                        results.votes[0]["average_negative"] = results.average_negative[0].average_negative;
                         delete results.average_negative;
                         callback(results);
                     });

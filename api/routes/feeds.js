@@ -98,10 +98,10 @@ router.post('/flagPost', function (req, res, next) {
                         status: false,
                         message: 'Feed is already deleted.',
                     });
-                } else if (Object.keys(result).length > 0 && result.hasOwnProperty('flagged')) {
+                } else if (Object.keys(result).length > 0 && result.hasOwnProperty('feed_not_exist')) {
                     res.status(422).json({
                         status: false,
-                        message: 'Feed is already flagged.',
+                        message: 'Feed not exist.',
                     });
                 } else {
                     res.status(422).json({
