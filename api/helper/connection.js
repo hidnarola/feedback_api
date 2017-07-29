@@ -4,9 +4,9 @@ var conn = {};
 
 function handleDisconnect() {
     var db_config = {
-        host: '192.168.1.201',
-        user: 'feedback_app',
-        password: '2Vc4830WY68rm4F',
+        host: '192.241.211.154',
+        user: 'root',
+        password: 'Trb3KwXYWs3XJ',
         database: 'feedback_app'
     };
 
