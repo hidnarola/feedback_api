@@ -152,4 +152,42 @@ router.post('/getPostDetails', function (req, res, next) {
     });
 
 });
+router.post('/resetFeedNotification', function (req, res, next) {
+    var schema = {
+        'feed_id': {
+            in: 'body',
+            notEmpty: true,
+            errorMessage: 'feed_id is required'
+        },
+    };
+    req.check(schema);
+    req.getValidationResult().then(function (result) {
+        if (!result.isEmpty()) {
+            var v_result = {
+                status: false,
+                error: result.array()
+            };
+            res.json(v_result);
+        } else {
+            Feed.resetFeedNotification(req.body, function (result) {               
+                if (Object.keys(result).length > 0 && result.hasOwnProperty('feed_id')) {
+                    res.status(200).json({
+                        status: true
+                    });
+                } else if (Object.keys(result).length > 0 && result.hasOwnProperty('feed_not_exist')) {
+                    res.status(422).json({
+                        status: false,
+                        message: 'Feed not exist.',
+                    });
+                } else {
+                    res.status(422).json({
+                        status: false,
+                        message: 'Something went wrong. Please try again.',
+                    });
+                }
+            })
+        }
+    });
+
+});
 module.exports = router;

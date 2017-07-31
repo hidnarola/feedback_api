@@ -119,7 +119,7 @@ var User = {
                 });
             },
             feeds: function (callback) {
-                con.connection.query("SELECT f.id,f.feed_text,f.flag_type FROM feeds f INNER JOIN users u ON f.user_id = u.id WHERE f.user_id=? AND f.is_deleted = '0' ORDER BY f.created desc", [json.device_user_id], function (err, result_feeds) {
+                con.connection.query("SELECT f.id,f.feed_text,f.flag_type,f.new_notification FROM feeds f INNER JOIN users u ON f.user_id = u.id WHERE f.user_id=? AND f.is_deleted = '0' ORDER BY f.created desc", [json.device_user_id], function (err, result_feeds) {
                     if (err) {
                         console.log(err);
                     } else {

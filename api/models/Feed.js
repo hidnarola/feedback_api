@@ -135,7 +135,7 @@ var Feed = {
                     }
                 } else {
                     var result = {}
-                    result = {'feed_not_exist': json.feed_id};                    
+                    result = {'feed_not_exist': json.feed_id};
                     callback(result);
                 }
             }
@@ -213,6 +213,31 @@ var Feed = {
                         results.votes[0]["average_negative"] = results.average_negative[0].average_negative;
                         delete results.average_negative;
                         callback(results);
+                    });
+                } else {
+                    var result = {}
+                    result = {'feed_not_exist': json.feed_id};
+                    console.log(result);
+                    callback(result);
+                }
+            }
+        });
+
+    },
+    resetFeedNotification: function (json, callback) {
+        console.log("resetFeedNotification Called.");
+        con.connection.query("SELECT id FROM feeds where id = ?", [json.feed_id], function (err, result) {
+            if (err) {
+                console.log("error:", err);
+            } else {
+                if (result.length > 0 && result[0].hasOwnProperty('id')) {
+                    con.connection.query("UPDATE feeds set new_notification = 0 WHERE id = ? ", [json.feed_id], function (err, ru) {
+                        if (err) {
+                            console.log("error:", err);
+                        } else {
+                            result = {'feed_id': json.feed_id};
+                            callback(result)
+                        }
                     });
                 } else {
                     var result = {}
