@@ -68,7 +68,8 @@ var User = {
             sql += " f.id < '" + json.id + "' AND ";           
         }
         
-        sql += " u.city LIKE '%" + json.city + "%' AND u.state LIKE '%" + json.state + "%' AND u.country LIKE '%" + json.country + "%'  AND f.user_id != '"+json.device_user_id+"' AND f.is_deleted = '0'";
+//        sql += " u.city LIKE '%" + json.city + "%' AND u.state LIKE '%" + json.state + "%' AND u.country LIKE '%" + json.country + "%'  AND f.user_id != '"+json.device_user_id+"' AND f.is_deleted = '0'";
+        sql += " f.user_id != '"+json.device_user_id+"' AND f.is_deleted = '0'";
         
         sql += " ORDER BY f.created DESC,f.id DESC";
 

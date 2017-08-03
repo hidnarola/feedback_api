@@ -47,7 +47,7 @@ router.post('/createFeed', function (req, res, next) {
 
 router.post('/getAllFeeds', function (req, res, next) {
     var schema = {
-        'city': {
+       /* 'city': {
             in: 'body',
             notEmpty: true,
             errorMessage: 'city is required'
@@ -61,7 +61,7 @@ router.post('/getAllFeeds', function (req, res, next) {
             in: 'body',
             notEmpty: true,
             errorMessage: 'country is required'
-        },
+        }, */
     };
     req.check(schema);
     req.getValidationResult().then(function (result) {
