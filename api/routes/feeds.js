@@ -190,4 +190,13 @@ router.post('/resetFeedNotification', function (req, res, next) {
     });
 
 });
+router.get('/getNotificationCount', function (req, res, next) {
+    Feed.getNotificationCount(req.body, function (result) {
+        res.status(200).json({
+            status: true,
+            data: result
+        });
+    })
+
+});
 module.exports = router;

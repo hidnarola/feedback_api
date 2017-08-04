@@ -1,5 +1,6 @@
 var con = require('../helper/connection');
 var async = require("async");
+var _ = require('underscore-node');
 
 var Feed = {
     giveVote: function (json, callback) {
@@ -245,6 +246,34 @@ var Feed = {
                     console.log(result);
                     callback(result);
                 }
+            }
+        });
+
+    },
+    getNotificationCount: function (json, callback) {
+        console.log("getNotificationCount Called.");
+        var sql = "SELECT id,feed_text,new_notification FROM feeds where is_deleted = 0 AND user_id = ?";
+        con.connection.query(sql, [json.device_user_id], function (err, result_feeds) {
+            var total_notification = 0;
+            var newjson = {}
+            var result = {}
+            if (err) {
+                console.log("error:", err);
+                callback(result);
+            } else {
+                var result_arr = _.map(result_feeds, function (obj) {
+                    total_notification += obj.new_notification;
+                    var p = {
+                        "id": obj.id,
+                        "feed_text": obj.feed_text,                        
+                        "new_notification": obj.new_notification,                      
+                    };
+                });
+                newjson = {
+                    total_notification: total_notification,
+                    feeds: result_feeds
+                }
+                callback(newjson);
             }
         });
 
