@@ -30,7 +30,7 @@ var Feed = {
                                 is_insert = true;
                             }
                             if (is_update) {
-                                con.connection.query("UPDATE feed_votes SET vote_value='?' WHERE id=?", [json.vote_value, result_fv[0].id], function (err, result_feed) {
+                                con.connection.query("UPDATE feed_votes SET vote_value= ? WHERE id=?", [json.vote_value, result_fv[0].id], function (err, result_feed) {
                                     var result = {}
                                     if (err) {
                                         console.log(err);
