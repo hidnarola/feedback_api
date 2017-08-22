@@ -190,7 +190,7 @@ var Feed = {
 
                         },
                         positive_location_votes: function (callback) {
-                            con.connection.query("select id,vote_value,user_id,city,state,country FROM feed_votes where feed_id= ? AND vote_value > 0  group by city,state,country", [json.feed_id], function (err, result_votes) {
+                            con.connection.query("select id,vote_value,user_id,city,state,country FROM feed_votes where feed_id= ? AND vote_value > 0", [json.feed_id], function (err, result_votes) {
                                 if (err) {
                                     console.log(err);
                                 } else {
@@ -199,7 +199,7 @@ var Feed = {
                             });
                         },
                         negative_location_votes: function (callback) {
-                            con.connection.query("select id,vote_value,user_id,city,state,country FROM feed_votes where feed_id= ? AND vote_value < 0 group by city,state,country", [json.feed_id], function (err, result_votes) {
+                            con.connection.query("select id,vote_value,user_id,city,state,country FROM feed_votes where feed_id= ? AND vote_value < 0", [json.feed_id], function (err, result_votes) {
                                 if (err) {
                                     console.log(err);
                                 } else {
